@@ -118,21 +118,23 @@ int main()
 	//Entity Manager
 	EntityManager *entities = new EntityManager(TextureID, MatrixID, ViewMatrixID, ModelMatrixID, dynamicsWorld);
 
-	btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0, 1, 0), 0);
+	btCollisionShape* groundShape = new btBoxShape(btVector3(60, 1, 60));
 	btCollisionShape* sphereShape = new btSphereShape(1.0f);
 
 	entities->createEntity("sphere.obj", "checker.png", glm::vec3(0, 0, 0), glm::quat(0, 0, 0, 1), sphereShape, btScalar(1), &btVector3(0, 0, 0));
-	entities->createEntity("plane.obj", "test_texture.png", glm::vec3(0, -2, 0), glm::quat(0, 0, 0, 1), groundShape);
+	entities->createEntity("plane.obj", "test_texture.png", glm::vec3(0, -5, 0), glm::quat(0, 0, 0, 1), groundShape);
 	entities->getEntity(0)->setRestitution(0.8f);
-	entities->getEntity(0)->getRigidBody()->setRollingFriction(20.0f);
+	entities->getEntity(0)->getRigidBody()->setRollingFriction(0.3f);
+	entities->getEntity(0)->setFriction(1);
+	entities->getEntity(0)->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	entities->getEntity(1)->setRestitution(0.5f);
+	entities->getEntity(1)->setFriction(1);
+	entities->getEntity(1)->getRigidBody()->setRollingFriction(1);
 
 	// For speed computation
 	double lastTime = glfwGetTime();
 	int nbFrames = 0;
 
-	// Initial position : on +Z
-	glm::vec3 camPosition = glm::vec3(0, 0, 5);
 	// Initial horizontal angle : toward -Z
 	float horizontalAngle = 3.14f;
 	// Initial vertical angle : none
@@ -168,6 +170,12 @@ int main()
 				glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
 
 				dynamicsWorld->stepSimulation(1 / 144.0f, 10);
+
+				if (glfwGetKey(window, GLFW_KEY_R))
+				{
+					glm::vec3 curPos = entities->getEntity(0)->getPosition();
+					entities->getEntity(0)->setPosition(glm::vec3(curPos.x, curPos.y + 1, curPos.z));
+				}
 
 				entities->updateAll();
 				entities->drawAll(&ProjectionMatrix, &ViewMatrix);

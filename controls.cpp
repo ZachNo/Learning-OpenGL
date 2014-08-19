@@ -30,22 +30,22 @@ void computeMatricesFromInputs(GLFWwindow* window, float* horzAng, float* vertAn
 	if (glfwGetKey(window, GLFW_KEY_W))
 	{
 		btVector3 btDir = btVector3(-direction.x, direction.y, -direction.z);
-		ent->getRigidBody()->applyForce(btDir, btVector3(0, 1, 0));
+		ent->getRigidBody()->applyForce(btDir, btVector3(0, 5, 0));
 	}
 	if (glfwGetKey(window, GLFW_KEY_S))
 	{
 		btVector3 btDir = btVector3(direction.x, direction.y, direction.z);
-		ent->getRigidBody()->applyForce(btDir, btVector3(0, 1, 0));
+		ent->getRigidBody()->applyForce(btDir, btVector3(0, 5, 0));
 	}
 	if (glfwGetKey(window, GLFW_KEY_A))
 	{
 		btVector3 btDir = btVector3(right.x, right.y, right.z);
-		ent->getRigidBody()->applyForce(btDir, btVector3(0, 1, 0));
+		ent->getRigidBody()->applyForce(btDir, btVector3(0, 5, 0));
 	}
 	if (glfwGetKey(window, GLFW_KEY_D))
 	{
 		btVector3 btDir = btVector3(-right.x, right.y, -right.z);
-		ent->getRigidBody()->applyForce(btDir, btVector3(0, 1, 0));
+		ent->getRigidBody()->applyForce(btDir, btVector3(0, 5, 0));
 	}
 	// Up vector
 	glm::vec3 up = glm::cross(right, direction);
@@ -57,7 +57,7 @@ void computeMatricesFromInputs(GLFWwindow* window, float* horzAng, float* vertAn
 	*ProjectionMatrix = glm::perspective(fov, 4.0f / 3.0f, 0.1f, 100.0f);
 	// Camera matrix
 	*ViewMatrix = glm::lookAt(
-		orbitPos + offset, // Camera is here
+		orbitPos + offset + glm::vec3(0, 2, 0), // Camera is here
 		orbitPos, // and looks here : at the same position, plus "direction"
 		up // Head is up (set to 0,-1,0 to look upside-down)
 		);
