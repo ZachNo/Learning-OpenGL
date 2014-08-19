@@ -2,7 +2,7 @@
 
 const float MOUSESPEED = 0.005f;
 
-void computeMatricesFromInputs(GLFWwindow* window, float* horzAng, float* vertAng, float fov, Entity* ent, glm::mat4* ViewMatrix, glm::mat4* ProjectionMatrix)
+void computeMatricesFromInputs(GLFWwindow* window, float* horzAng, float* vertAng, float fov, Entity* ent, glm::mat4* ViewMatrix, glm::mat4* ProjectionMatrix, bool mouseLock)
 {
 	glm::vec3 orbitPos = ent->getPosition();
 
@@ -10,12 +10,15 @@ void computeMatricesFromInputs(GLFWwindow* window, float* horzAng, float* vertAn
 	double xpos, ypos;
 	glfwGetCursorPos(window, &xpos, &ypos);
 
-	// Reset mouse position for next frame
-	glfwSetCursorPos(window, 1024 / 2, 768 / 2);
+	if (mouseLock)
+	{
+		// Reset mouse position for next frame
+		glfwSetCursorPos(window, 1024 / 2, 768 / 2);
 
-	// Compute new orientation
-	*horzAng += MOUSESPEED * float(1024 / 2 - xpos);
-	//*vertAng += MOUSESPEED * float(768 / 2 - ypos);
+		// Compute new orientation
+		*horzAng += MOUSESPEED * float(1024 / 2 - xpos);
+		//*vertAng += MOUSESPEED * float(768 / 2 - ypos);
+	}
 
 	//Direction is straight forward
 	glm::vec3 direction( sin(*horzAng), 0, cos(*horzAng) );

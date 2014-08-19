@@ -144,6 +144,9 @@ int main()
 	glm::mat4 ViewMatrix;
 	glm::mat4 ProjectionMatrix;
 
+	bool mouseLock = 1;
+	bool L_keyDown = 0;
+
 	try{
 		do{
 			try{
@@ -163,8 +166,19 @@ int main()
 				// Use our shader
 				glUseProgram(programID);
 
+				if (glfwGetKey(window, GLFW_KEY_L) && !L_keyDown)
+				{
+					if (mouseLock)
+						mouseLock = 0;
+					else
+						mouseLock = 1;
+					L_keyDown = 1;
+				}
+				else if (!glfwGetKey(window, GLFW_KEY_L))
+					L_keyDown = 0;
+
 				// Compute the MVP matrix from keyboard and mouse input
-				computeMatricesFromInputs(window, &horizontalAngle, &verticalAngle, fov, entities->getEntity(0), &ViewMatrix, &ProjectionMatrix);
+				computeMatricesFromInputs(window, &horizontalAngle, &verticalAngle, fov, entities->getEntity(0), &ViewMatrix, &ProjectionMatrix, mouseLock);
 
 				glm::vec3 lightPos = glm::vec3(4, 4, 4);
 				glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);

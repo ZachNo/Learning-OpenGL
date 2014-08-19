@@ -14,7 +14,7 @@ using namespace glm;
 
 #include "entity.h"
 
-void computeMatricesFromInputs(GLFWwindow* window, float* horzAng, float* vertAng, float fov, Entity* ent, glm::mat4* ViewMatrix, glm::mat4* ProjectionMatrix);
+void computeMatricesFromInputs(GLFWwindow* window, float* horzAng, float* vertAng, float fov, Entity* ent, glm::mat4* ViewMatrix, glm::mat4* ProjectionMatrix, bool mouseLock);
 glm::mat4 getViewMatrix();
 glm::mat4 getProjectionMatrix();
 
