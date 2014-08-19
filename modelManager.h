@@ -56,7 +56,7 @@ public:
 	~ModelManager();
 
 	GLuint newModel(std::string filepath);
-	bool draw(GLuint index, GLuint texIndex, glm::vec3 pos, glm::quat rot, glm::vec3 scale, glm::mat4 projMat, glm::mat4 viewMat);
+	bool draw(GLuint index, GLuint texIndex, glm::vec3 pos, glm::quat rot, glm::vec3 scale, glm::mat4* projMat, glm::mat4* viewMat);
 	btCollisionShape* getColShape(GLuint index)
 	{ return &colShapes.at(index); }
 };

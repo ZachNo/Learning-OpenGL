@@ -22,9 +22,8 @@ using namespace glm;
 #include <stdlib.h>
 #include <crtdbg.h>
 
+//Defined for texturemanager
 #define STB_IMAGE_IMPLEMENTATION
-//Include image loading
-//#include "stb_image.h"
 
 //Include shader
 #include "shader.h"
@@ -40,10 +39,6 @@ using namespace glm;
 
 //Include PhysicsManager
 #include "physics.h"
-
-//temp for testing
-//#include "textureManager.h"
-//#include "modelManager.h"
 
 int main()
 {
@@ -143,66 +138,65 @@ int main()
 	// Initial vertical angle : none
 	float verticalAngle = 0.0f;
 	// Initial Field of View
-	float initialFoV = 90.0f;
+	float fov = 90.0f;
+	glm::mat4 ViewMatrix;
+	glm::mat4 ProjectionMatrix;
 
-	do{
-		try{
-			// Measure speed
-			double currentTime = glfwGetTime();
-			nbFrames++;
-			if (currentTime - lastTime >= 1.0){ // If last prinf() was more than 1sec ago
-				// printf and reset
-				printf("%f ms/frame %f FPS\n", 1000.0 / double(nbFrames), double(nbFrames));
-				nbFrames = 0;
-				lastTime += 1.0;
+	try{
+		do{
+			try{
+				// Measure speed
+				double currentTime = glfwGetTime();
+				nbFrames++;
+				if (currentTime - lastTime >= 1.0){ // If last prinf() was more than 1sec ago
+					// printf and reset
+					printf("%f ms/frame %f FPS\n", 1000.0 / double(nbFrames), double(nbFrames));
+					nbFrames = 0;
+					lastTime += 1.0;
+				}
+
+				// Clear the screen
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+				// Use our shader
+				glUseProgram(programID);
+
+				// Compute the MVP matrix from keyboard and mouse input
+				computeMatricesFromInputs(window, &horizontalAngle, &verticalAngle, fov, entities->getEntity(0), &ViewMatrix, &ProjectionMatrix);
+
+				glm::vec3 lightPos = glm::vec3(4, 4, 4);
+				glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
+
+				dynamicsWorld->stepSimulation(1 / 144.0f, 10);
+
+				entities->updateAll();
+				entities->drawAll(&ProjectionMatrix, &ViewMatrix);
+
+
+				glDisableVertexAttribArray(0);
+				glDisableVertexAttribArray(1);
+				glDisableVertexAttribArray(2);
+
+				// Swap buffers
+				glfwSwapBuffers(window);
+				glfwPollEvents();
 			}
+			catch (const char *str)
+			{
+				throw str;
+			}
+			catch (...)
+			{
+				throw "Unknown error occured!\n";
+			}
+		} // Check if the ESC key was pressed or the window was closed
+		while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window) == 0);
+	}
+	catch (const char *str)
+	{
+		std::cout << str << std::endl;
+	}
 
-			// Clear the screen
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			// Use our shader
-			glUseProgram(programID);
-
-			// Compute the MVP matrix from keyboard and mouse input
-			computeMatricesFromInputs(window);
-			glm::mat4 ProjectionMatrix = getProjectionMatrix();
-			glm::mat4 ViewMatrix = getViewMatrix();
-
-			glm::vec3 lightPos = glm::vec3(4, 4, 4);
-			glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
-
-			dynamicsWorld->stepSimulation(1 / 144.0f, 10);
-
-			if (glfwGetKey(window, GLFW_KEY_W))
-				entities->getEntity(0)->getRigidBody()->applyForce(btVector3(0, 0, -1), btVector3(0, 1, 0));
-			if (glfwGetKey(window, GLFW_KEY_S))
-				entities->getEntity(0)->getRigidBody()->applyForce(btVector3(0, 0, 1), btVector3(0, 1, 0));
-			if (glfwGetKey(window, GLFW_KEY_A))
-				entities->getEntity(0)->getRigidBody()->applyForce(btVector3(-1, 0, 0), btVector3(0, 1, 0));
-			if (glfwGetKey(window, GLFW_KEY_D))
-				entities->getEntity(0)->getRigidBody()->applyForce(btVector3(1, 0, 0), btVector3(0, 1, 0));
-
-			entities->updateAll();
-			entities->drawAll(ProjectionMatrix, ViewMatrix);
-
-			glDisableVertexAttribArray(0);
-			glDisableVertexAttribArray(1);
-			glDisableVertexAttribArray(2);
-
-			// Swap buffers
-			glfwSwapBuffers(window);
-			glfwPollEvents();
-		}
-		catch (const char *str)
-		{
-			std::cout << str << std::endl;
-		}
-		catch (...)
-		{
-			std::cout << "Unknown error occured!" << std::endl;
-		}
-	} // Check if the ESC key was pressed or the window was closed
-	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window) == 0);
 
 	// Cleanup VBO and shader
 	glDeleteProgram(programID);
@@ -222,6 +216,8 @@ int main()
 		_CrtMemDumpStatistics(&s3);
 	else
 		std::cout << "No difference1\n";
+
+	//system("pause");
 
 	return 0;
 }

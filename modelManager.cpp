@@ -97,7 +97,7 @@ GLuint ModelManager::newModel(std::string filepath)
 	return indices.size() - 1;
 }
 
-bool ModelManager::draw(GLuint index, GLuint texIndex, glm::vec3 pos, glm::quat rot, glm::vec3 scale, glm::mat4 projMat, glm::mat4 viewMat)
+bool ModelManager::draw(GLuint index, GLuint texIndex, glm::vec3 pos, glm::quat rot, glm::vec3 scale, glm::mat4* projMat, glm::mat4* viewMat)
 {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texIndex);
@@ -107,7 +107,6 @@ bool ModelManager::draw(GLuint index, GLuint texIndex, glm::vec3 pos, glm::quat 
 	GLuint uvbuffer = uvs.at(index);
 	GLuint normalbuffer = normals.at(index);
 	GLuint elementbuffer = indices.at(index);
-
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -149,14 +148,12 @@ bool ModelManager::draw(GLuint index, GLuint texIndex, glm::vec3 pos, glm::quat 
 	glm::mat4 ScalingMatrix = glm::scale(mat4(), scale);
 	glm::mat4 ModelMatrix = TranslationMatrix * RotationMatrix * ScalingMatrix;
 
-	glm::mat4 MVP = projMat * viewMat * ModelMatrix;
-
+	glm::mat4 MVP = *projMat * *viewMat * ModelMatrix;
 	// Send our transformation to the currently bound shader, 
 	// in the "MVP" uniform
 	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 	glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
-	glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &viewMat[0][0]);
-
+	glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &(*viewMat)[0][0]);
 
 	// Draw the triangles !
 	glDrawElements(

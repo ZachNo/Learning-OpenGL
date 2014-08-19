@@ -53,7 +53,7 @@ public:
 	{ rigidBody->setRestitution(res); }
 	void setFriction(float fric)
 	{ rigidBody->setFriction(fric); }
-	bool draw(glm::mat4 proj, glm::mat4 view);
+	bool draw(glm::mat4* proj, glm::mat4* view);
 	void update();
 
 };
@@ -75,7 +75,7 @@ public:
 	bool createEntity(std::string modelFile, std::string textureFile, glm::vec3 pos, glm::quat rot);
 	bool createEntity(std::string modelFile, std::string textureFile, glm::vec3 pos, glm::quat rot, btCollisionShape* colShape);
 	bool createEntity(std::string modelFile, std::string textureFile, glm::vec3 pos, glm::quat rot, btCollisionShape* colShape, btScalar mass, btVector3 *interia);
-	bool drawAll(glm::mat4 proj, glm::mat4 view);
+	bool drawAll(glm::mat4* proj, glm::mat4* view);
 	void updateAll();
 	Entity* getEntity(unsigned int index)
 	{ 

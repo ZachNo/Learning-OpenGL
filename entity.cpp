@@ -3,7 +3,7 @@
 #include "entity.h"
 
 //Draw the model through the model manager
-bool Entity::draw(glm::mat4 proj, glm::mat4 view)
+bool Entity::draw(glm::mat4* proj, glm::mat4* view)
 {
 	if (visible)
 	{
@@ -49,7 +49,7 @@ bool EntityManager::createEntity(std::string modelFile, std::string textureFile,
 }
 
 //Draw all entities
-bool EntityManager::drawAll(glm::mat4 proj, glm::mat4 view)
+bool EntityManager::drawAll(glm::mat4* proj, glm::mat4* view)
 {
 	if (allEntities.size() < 1)
 		return 1;
