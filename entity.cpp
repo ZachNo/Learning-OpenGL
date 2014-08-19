@@ -136,11 +136,10 @@ void Entity::update()
 //Set position of model and of bullet object
 void Entity::setPosition(glm::vec3 newPos)
 {
-	pos = newPos;
 	btTransform trans;
 	rigidBody->getMotionState()->getWorldTransform(trans);
 	trans.setOrigin(btVector3(newPos.x, newPos.y, newPos.z));
-	rigidBody->getMotionState()->setWorldTransform(trans);
+	rigidBody->setWorldTransform(trans);
 }
 
 //set rotation of model and bullet object
@@ -150,5 +149,5 @@ void Entity::setRotation(glm::quat newRot)
 	btTransform trans;
 	rigidBody->getMotionState()->getWorldTransform(trans);
 	trans.setRotation(btQuaternion(newRot.w, newRot.x, newRot.y, newRot.z));
-	rigidBody->getMotionState()->setWorldTransform(trans);
+	rigidBody->setWorldTransform(trans);
 }

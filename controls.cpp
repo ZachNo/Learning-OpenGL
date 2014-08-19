@@ -4,6 +4,9 @@ const float MOUSESPEED = 0.005f;
 
 void computeMatricesFromInputs(GLFWwindow* window, float* horzAng, float* vertAng, float fov, Entity* ent, glm::mat4* ViewMatrix, glm::mat4* ProjectionMatrix, bool mouseLock)
 {
+	static bool jumpKeyDown = 0;
+	static double lastTime = glfwGetTime();
+
 	glm::vec3 orbitPos = ent->getPosition();
 
 	// Get mouse position
@@ -30,6 +33,7 @@ void computeMatricesFromInputs(GLFWwindow* window, float* horzAng, float* vertAn
 		cos(*horzAng - 3.14f / 2.0f)
 		);
 
+	//Controls for rolling the ball
 	if (glfwGetKey(window, GLFW_KEY_W))
 	{
 		btVector3 btDir = btVector3(-direction.x, direction.y, -direction.z);
@@ -50,6 +54,17 @@ void computeMatricesFromInputs(GLFWwindow* window, float* horzAng, float* vertAn
 		btVector3 btDir = btVector3(-right.x, right.y, -right.z);
 		ent->getRigidBody()->applyForce(btDir, btVector3(0, 5, 0));
 	}
+
+	//Control for jumping
+	if (glfwGetKey(window, GLFW_KEY_SPACE) && glfwGetTime() - lastTime > 2.5f)
+	{
+		//If time since last jump is more than 2.5 seconds
+		ent->getRigidBody()->applyImpulse(btVector3(0, -20, 0), btVector3(0, 1, 0));
+		jumpKeyDown = 1;
+		lastTime = glfwGetTime();
+	}
+
+
 	// Up vector
 	glm::vec3 up = glm::cross(right, direction);
 

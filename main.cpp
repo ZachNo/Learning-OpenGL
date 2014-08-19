@@ -118,7 +118,7 @@ int main()
 	//Entity Manager
 	EntityManager *entities = new EntityManager(TextureID, MatrixID, ViewMatrixID, ModelMatrixID, dynamicsWorld);
 
-	btCollisionShape* groundShape = new btBoxShape(btVector3(60, 1, 60));
+	btCollisionShape* groundShape = new btBoxShape(btVector3(30, 0.1, 30));
 	btCollisionShape* sphereShape = new btSphereShape(1.0f);
 
 	entities->createEntity("sphere.obj", "checker.png", glm::vec3(0, 0, 0), glm::quat(0, 0, 0, 1), sphereShape, btScalar(1), &btVector3(0, 0, 0));
@@ -184,12 +184,6 @@ int main()
 				glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
 
 				dynamicsWorld->stepSimulation(1 / 144.0f, 10);
-
-				if (glfwGetKey(window, GLFW_KEY_R))
-				{
-					glm::vec3 curPos = entities->getEntity(0)->getPosition();
-					entities->getEntity(0)->setPosition(glm::vec3(curPos.x, curPos.y + 1, curPos.z));
-				}
 
 				entities->updateAll();
 				entities->drawAll(&ProjectionMatrix, &ViewMatrix);
