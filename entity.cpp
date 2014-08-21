@@ -15,7 +15,7 @@ bool Entity::draw(glm::mat4* proj, glm::mat4* view)
 
 bool EntityManager::createEntity(std::string modelFile, std::string textureFile, glm::vec3 pos, glm::quat rot)
 {
-	GLuint modelIndex = modMan->newModel(modelFile);
+	GLuint modelIndex = modMan->newModel(modelFile, 0);
 	GLuint textureIndex = texMan->importTexture(textureFile);
 	Entity newEnt(modMan, modelIndex, textureIndex, pos, rot, modMan->getColShape(modelIndex), 0, 0, &btVector3(0, 0, 0));
 	dynamicsWorld->addRigidBody(newEnt.getRigidBody());
@@ -25,17 +25,30 @@ bool EntityManager::createEntity(std::string modelFile, std::string textureFile,
 
 bool EntityManager::createEntity(std::string modelFile, std::string textureFile, glm::vec3 pos, glm::quat rot, btCollisionShape* colShape)
 {
-	GLuint modelIndex = modMan->newModel(modelFile);
-	GLuint textureIndex = texMan->importTexture(textureFile);
-	Entity newEnt(modMan, modelIndex, textureIndex, pos, rot, colShape, 1, 0, &btVector3(0, 0, 0));
-	dynamicsWorld->addRigidBody(newEnt.getRigidBody());
-	allEntities.push_back(newEnt);
+	GLuint modelIndex;
+	Entity* newEnt;
+	if (colShape == NULL)
+	{
+		modelIndex = modMan->newModel(modelFile, 1);
+		GLuint textureIndex = texMan->importTexture(textureFile);
+		btCollisionShape* meshCol = modMan->getColShape(modelIndex-1);
+		newEnt = new Entity(modMan, modelIndex, textureIndex, pos, rot, meshCol, 0, 0, &btVector3(0, 0, 0));
+	}
+	else
+	{
+		modelIndex = modMan->newModel(modelFile, 0);
+		GLuint textureIndex = texMan->importTexture(textureFile);
+		newEnt = new Entity(modMan, modelIndex, textureIndex, pos, rot, colShape, 1, 0, &btVector3(0, 0, 0));
+	}
+	dynamicsWorld->addRigidBody(newEnt->getRigidBody());
+	allEntities.push_back(*newEnt);
+	delete newEnt;
 	return 1;
 }
 
 bool EntityManager::createEntity(std::string modelFile, std::string textureFile, glm::vec3 pos, glm::quat rot, btCollisionShape* colShape, btScalar mass, btVector3 *interia)
 {
-	GLuint modelIndex = modMan->newModel(modelFile);
+	GLuint modelIndex = modMan->newModel(modelFile, 0);
 	GLuint textureIndex = texMan->importTexture(textureFile);
 	Entity *newEnt;
 	if (colShape == NULL)
@@ -78,7 +91,7 @@ Entity::Entity(ModelManager *mod, GLuint modI, GLuint texI, glm::vec3 p, glm::qu
 		nonMoving = 1;
 
 	//Create bullet physics stuff
-	motionState = new btDefaultMotionState(btTransform(btQuaternion(r.w, r.x, r.y, r.z), btVector3(p.x, p.y, p.z)));
+	motionState = new btDefaultMotionState(btTransform(btQuaternion(r.z, r.x, r.y, r.w), btVector3(p.x, p.y, p.z)));
 	if (mass > 0)
 		colShape->calculateLocalInertia(mass, *interia);
 	btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(mass, motionState, colShape, *interia);
@@ -96,7 +109,7 @@ EntityManager::~EntityManager()
 		dynamicsWorld->removeRigidBody(rigid);
 		delete rigid->getMotionState();
 		delete rigid;
-		if (allEntities.at(i).isCustomShape() && allEntities.at(i).getColShape() != NULL)
+		if (allEntities.at(i).getColShape() != NULL)
 		{
 			//if using custom shape, remove shape from all objects using it and delete it
 			btCollisionShape *shp = allEntities.at(i).getColShape();

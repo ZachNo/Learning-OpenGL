@@ -2,9 +2,8 @@
 
 const float MOUSESPEED = 0.005f;
 
-void computeMatricesFromInputs(GLFWwindow* window, float* horzAng, float* vertAng, float fov, Entity* ent, glm::mat4* ViewMatrix, glm::mat4* ProjectionMatrix, bool mouseLock)
+void computeMatricesFromInputs(GLFWwindow* window, btDynamicsWorld* world, float* horzAng, float* vertAng, float fov, Entity* ent, glm::mat4* ViewMatrix, glm::mat4* ProjectionMatrix, bool mouseLock)
 {
-	static bool jumpKeyDown = 0;
 	static double lastTime = glfwGetTime();
 
 	glm::vec3 orbitPos = ent->getPosition();
@@ -59,9 +58,33 @@ void computeMatricesFromInputs(GLFWwindow* window, float* horzAng, float* vertAn
 	if (glfwGetKey(window, GLFW_KEY_SPACE) && glfwGetTime() - lastTime > 2.5f)
 	{
 		//If time since last jump is more than 2.5 seconds
-		ent->getRigidBody()->applyImpulse(btVector3(0, -20, 0), btVector3(0, 1, 0));
-		jumpKeyDown = 1;
+
+		btVector3 normal(0.0f, 0.0f, 0.0f);
+		int numManifolds = world->getDispatcher()->getNumManifolds();
+		for (int i = 0; i<numManifolds; i++)
+		{
+			btPersistentManifold* contactManifold = world->getDispatcher()->getManifoldByIndexInternal(i);
+			btCollisionObject* obA = const_cast<btCollisionObject*>(contactManifold->getBody0());
+			btCollisionObject* obB = const_cast<btCollisionObject*>(contactManifold->getBody1());
+
+			if (obA != ent->getRigidBody() && obB != ent->getRigidBody())
+			{
+				std::cout << "Neither object is ball!\n" << obA << " != " << ent->getRigidBody() << "\n" << obB << " != " << ent->getRigidBody() << std::endl;
+				continue;
+			}
+
+			int numContacts = contactManifold->getNumContacts();
+			for (int j = 0; j<numContacts; j++)
+			{
+				btManifoldPoint pt = contactManifold->getContactPoint(j);
+				if (pt.getDistance() < 0.1f)
+					normal = pt.m_normalWorldOnB;
+			}
+		}
+		ent->getRigidBody()->applyImpulse(normal * 10, btVector3(0, 1, 0));
 		lastTime = glfwGetTime();
+		std::cout << normal.getX() << " " << normal.getY() << " " << normal.getZ() << std::endl;
+
 	}
 
 

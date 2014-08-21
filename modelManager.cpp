@@ -13,7 +13,7 @@ GLuint ModelManager::checkIfModelExists(std::string filepath)
 	return -1;
 }
 
-GLuint ModelManager::newModel(std::string filepath)
+GLuint ModelManager::newModel(std::string filepath, bool useMeshAsColShape)
 {
 	GLuint precheck = checkIfModelExists(filepath);
 	if (precheck != -1)
@@ -82,7 +82,6 @@ GLuint ModelManager::newModel(std::string filepath)
 	glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
 	glBufferData(GL_ARRAY_BUFFER, norm.size() * sizeof(glm::vec3), &norm[0], GL_STATIC_DRAW);
 
-	// Generate a buffer for the indices as well
 	GLuint elementbuffer;
 	glGenBuffers(1, &elementbuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
@@ -93,6 +92,39 @@ GLuint ModelManager::newModel(std::string filepath)
 	normals.push_back(normalbuffer);
 	indices.push_back(elementbuffer);
 	indicesSize.push_back(ind.size());
+
+	if (useMeshAsColShape)
+	{
+		btTriangleMesh* trigMesh = new btTriangleMesh;
+		int totalVerts = mesh->mNumVertices;
+
+		std::cout << "Build colMesh\n";
+		for (int i = 0; i < totalVerts;)
+		{
+			//glm::vec3 vecA = vert.at(ind.at(i++));
+			aiVector3D vecA = mesh->mVertices[i++];
+			btVector3 vertA(vecA.x, vecA.y, vecA.z);
+			//glm::vec3 vecB = vert.at(ind.at(i++));
+			aiVector3D vecB = mesh->mVertices[i++];
+			btVector3 vertB(vecB.x, vecB.y, vecB.z);
+			//glm::vec3 vecC = vert.at(ind.at(i++));
+			aiVector3D vecC = mesh->mVertices[i++];
+			btVector3 vertC(vecC.x, vecC.y, vecC.z);
+			trigMesh->addTriangle(vertA, vertB, vertC);
+
+			//std::cout << vecA.x << " " << vecA.y << " " << vecA.z << " : " << vecB.x << " " << vecB.y << " " << vecB.z << " : " << vecC.x << " " << vecC.y << " " << vecC.z << std::endl;
+		}
+		std::cout << "Done building colMesh\n";
+
+		btTriangleIndexVertexArray* indexArray = new btTriangleIndexVertexArray(*trigMesh);
+
+		btVector3 aabbMin(-1000, -1000, -1000), aabbMax(1000, 1000, 1000);
+
+		btCollisionShape* meshCol = new btBvhTriangleMeshShape(indexArray, 1, aabbMin, aabbMax);
+		colShapes.push_back(meshCol);
+		//delete indexArray;
+		//delete trigMesh;
+	}
 
 	return indices.size() - 1;
 }

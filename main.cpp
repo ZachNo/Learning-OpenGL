@@ -40,6 +40,9 @@ using namespace glm;
 //Include PhysicsManager
 #include "physics.h"
 
+//Include modelManager for model data
+#include "modelManager.h"
+
 int main()
 {
 	_CrtMemState s1;
@@ -118,11 +121,14 @@ int main()
 	//Entity Manager
 	EntityManager *entities = new EntityManager(TextureID, MatrixID, ViewMatrixID, ModelMatrixID, dynamicsWorld);
 
-	btCollisionShape* groundShape = new btBoxShape(btVector3(30, 0.1, 30));
+	//btCollisionShape* groundShape = new btBoxShape(btVector3(30, 0.1, 30));
 	btCollisionShape* sphereShape = new btSphereShape(1.0f);
 
 	entities->createEntity("sphere.obj", "checker.png", glm::vec3(0, 0, 0), glm::quat(0, 0, 0, 1), sphereShape, btScalar(1), &btVector3(0, 0, 0));
-	entities->createEntity("plane.obj", "test_texture.png", glm::vec3(0, -5, 0), glm::quat(0, 0, 0, 1), groundShape);
+	entities->createEntity("ball_testCourse.obj", "test_texture.png", glm::vec3(0, -5, 0), glm::quat(1, 0, 0, 0), NULL);
+
+	std::cout << "initialized col mesh successfully\n";
+
 	entities->getEntity(0)->setRestitution(0.8f);
 	entities->getEntity(0)->getRigidBody()->setRollingFriction(0.3f);
 	entities->getEntity(0)->setFriction(1);
@@ -178,7 +184,7 @@ int main()
 					L_keyDown = 0;
 
 				// Compute the MVP matrix from keyboard and mouse input
-				computeMatricesFromInputs(window, &horizontalAngle, &verticalAngle, fov, entities->getEntity(0), &ViewMatrix, &ProjectionMatrix, mouseLock);
+				computeMatricesFromInputs(window, dynamicsWorld, &horizontalAngle, &verticalAngle, fov, entities->getEntity(0), &ViewMatrix, &ProjectionMatrix, mouseLock);
 
 				glm::vec3 lightPos = glm::vec3(4, 4, 4);
 				glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);

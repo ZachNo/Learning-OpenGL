@@ -35,7 +35,7 @@ class ModelManager
 
 	std::vector<std::string> filenames;
 
-	std::vector<btCollisionShape> colShapes;
+	std::vector<btCollisionShape*> colShapes;
 
 	GLuint texID;
 	GLuint MatrixID;
@@ -55,10 +55,10 @@ public:
 	};
 	~ModelManager();
 
-	GLuint newModel(std::string filepath);
+	GLuint newModel(std::string filepath, bool useMeshAsColShape);
 	bool draw(GLuint index, GLuint texIndex, glm::vec3 pos, glm::quat rot, glm::vec3 scale, glm::mat4* projMat, glm::mat4* viewMat);
 	btCollisionShape* getColShape(GLuint index)
-	{ return &colShapes.at(index); }
+	{ return colShapes.at(index); }
 };
 
 #endif

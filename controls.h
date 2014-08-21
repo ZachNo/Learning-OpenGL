@@ -12,9 +12,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 using namespace glm;
 
+#include <btBulletDynamicsCommon.h>
+
 #include "entity.h"
 
-void computeMatricesFromInputs(GLFWwindow* window, float* horzAng, float* vertAng, float fov, Entity* ent, glm::mat4* ViewMatrix, glm::mat4* ProjectionMatrix, bool mouseLock);
+void computeMatricesFromInputs(GLFWwindow* window, btDynamicsWorld* world, float* horzAng, float* vertAng, float fov, Entity* ent, glm::mat4* ViewMatrix, glm::mat4* ProjectionMatrix, bool mouseLock);
 glm::mat4 getViewMatrix();
 glm::mat4 getProjectionMatrix();
 
