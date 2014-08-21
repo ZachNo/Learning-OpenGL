@@ -36,6 +36,8 @@ class ModelManager
 	std::vector<std::string> filenames;
 
 	std::vector<btCollisionShape*> colShapes;
+	std::vector<btTriangleIndexVertexArray*> vertexArrays;
+	std::vector<btTriangleMesh*> triangleMeshes;
 
 	GLuint texID;
 	GLuint MatrixID;

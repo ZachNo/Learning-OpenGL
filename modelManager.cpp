@@ -98,7 +98,6 @@ GLuint ModelManager::newModel(std::string filepath, bool useMeshAsColShape)
 		btTriangleMesh* trigMesh = new btTriangleMesh;
 		int totalVerts = mesh->mNumVertices;
 
-		std::cout << "Build colMesh\n";
 		for (int i = 0; i < totalVerts;)
 		{
 			//glm::vec3 vecA = vert.at(ind.at(i++));
@@ -114,7 +113,6 @@ GLuint ModelManager::newModel(std::string filepath, bool useMeshAsColShape)
 
 			//std::cout << vecA.x << " " << vecA.y << " " << vecA.z << " : " << vecB.x << " " << vecB.y << " " << vecB.z << " : " << vecC.x << " " << vecC.y << " " << vecC.z << std::endl;
 		}
-		std::cout << "Done building colMesh " << trigMesh->getNumTriangles() << "\n";
 
 		btTriangleIndexVertexArray* indexArray = new btTriangleIndexVertexArray(*trigMesh);
 
@@ -122,8 +120,8 @@ GLuint ModelManager::newModel(std::string filepath, bool useMeshAsColShape)
 
 		btCollisionShape* meshCol = new btBvhTriangleMeshShape(indexArray, 1, aabbMin, aabbMax);
 		colShapes.push_back(meshCol);
-		//delete indexArray;
-		//delete trigMesh;
+		vertexArrays.push_back(indexArray);
+		triangleMeshes.push_back(trigMesh);
 	}
 
 	return indices.size() - 1;
@@ -199,11 +197,15 @@ bool ModelManager::draw(GLuint index, GLuint texIndex, glm::vec3 pos, glm::quat 
 
 ModelManager::~ModelManager()
 {
-	for (unsigned int i = 0; i < vertices.size(); i++)
+	for (unsigned int i = 0; i > indicesSize.size(); i++)
 	{
 		glDeleteBuffers(1, &vertices.at(i));
 		glDeleteBuffers(1, &uvs.at(i));
 		glDeleteBuffers(1, &normals.at(i));
 		glDeleteBuffers(1, &indices.at(i));
 	}
+	for (unsigned int i = 0; i < vertexArrays.size(); i++)
+		delete vertexArrays.at(i);
+	for (unsigned int i = 0; i < triangleMeshes.size(); i++)
+		delete triangleMeshes.at(i);
 }

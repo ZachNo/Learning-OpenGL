@@ -81,10 +81,12 @@ void computeMatricesFromInputs(GLFWwindow* window, btDynamicsWorld* world, float
 					normal = pt.m_normalWorldOnB;
 			}
 		}
-		ent->getRigidBody()->applyImpulse(normal * 10, btVector3(0, 1, 0));
-		lastTime = glfwGetTime();
-		std::cout << normal.getX() << " " << normal.getY() << " " << normal.getZ() << std::endl;
-
+		if (normal != btVector3(0.0f, 0.0f, 0.0f))
+		{
+			ent->getRigidBody()->applyImpulse(normal * 10, btVector3(0, 1, 0));
+			lastTime = glfwGetTime();
+			std::cout << normal.getX() << " " << normal.getY() << " " << normal.getZ() << std::endl;
+		}
 	}
 
 
