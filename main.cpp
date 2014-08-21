@@ -127,7 +127,7 @@ int main()
 	entities->createEntity("sphere.obj", "checker.png", glm::vec3(0, 0, 0), glm::quat(0, 0, 0, 1), sphereShape, btScalar(1), &btVector3(0, 0, 0));
 	entities->createEntity("ball_testCourse.obj", "test_texture.png", glm::vec3(0, -5, 0), glm::quat(1, 0, 0, 0), NULL);
 
-	std::cout << "initialized col mesh successfully\n";
+	std::cout << "initialized col mesh successfully\n"; 
 
 	entities->getEntity(0)->setRestitution(0.8f);
 	entities->getEntity(0)->getRigidBody()->setRollingFriction(0.3f);

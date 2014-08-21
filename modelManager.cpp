@@ -110,11 +110,11 @@ GLuint ModelManager::newModel(std::string filepath, bool useMeshAsColShape)
 			//glm::vec3 vecC = vert.at(ind.at(i++));
 			aiVector3D vecC = mesh->mVertices[i++];
 			btVector3 vertC(vecC.x, vecC.y, vecC.z);
-			trigMesh->addTriangle(vertA, vertB, vertC);
+			trigMesh->addTriangle(vertA, vertB, vertC, 1);
 
 			//std::cout << vecA.x << " " << vecA.y << " " << vecA.z << " : " << vecB.x << " " << vecB.y << " " << vecB.z << " : " << vecC.x << " " << vecC.y << " " << vecC.z << std::endl;
 		}
-		std::cout << "Done building colMesh\n";
+		std::cout << "Done building colMesh " << trigMesh->getNumTriangles() << "\n";
 
 		btTriangleIndexVertexArray* indexArray = new btTriangleIndexVertexArray(*trigMesh);
 
