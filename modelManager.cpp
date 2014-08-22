@@ -1,5 +1,6 @@
 #include "modelManager.h"
 
+//see if model already imported, if so return that number
 GLuint ModelManager::checkIfModelExists(std::string filepath)
 {
 	if (filenames.size() < 1)
@@ -13,6 +14,7 @@ GLuint ModelManager::checkIfModelExists(std::string filepath)
 	return -1;
 }
 
+//load new model into opengl
 GLuint ModelManager::newModel(std::string filepath, bool useMeshAsColShape)
 {
 	GLuint precheck = checkIfModelExists(filepath);
@@ -93,6 +95,7 @@ GLuint ModelManager::newModel(std::string filepath, bool useMeshAsColShape)
 	indices.push_back(elementbuffer);
 	indicesSize.push_back(ind.size());
 
+	//use the mesh as collsion mesh
 	if (useMeshAsColShape)
 	{
 		btTriangleMesh* trigMesh = new btTriangleMesh;
@@ -127,6 +130,7 @@ GLuint ModelManager::newModel(std::string filepath, bool useMeshAsColShape)
 	return indices.size() - 1;
 }
 
+//draw the model
 bool ModelManager::draw(GLuint index, GLuint texIndex, glm::vec3 pos, glm::quat rot, glm::vec3 scale, glm::mat4* projMat, glm::mat4* viewMat)
 {
 	glActiveTexture(GL_TEXTURE0);
@@ -195,6 +199,7 @@ bool ModelManager::draw(GLuint index, GLuint texIndex, glm::vec3 pos, glm::quat 
 	return 1;
 }
 
+//delete everything
 ModelManager::~ModelManager()
 {
 	for (unsigned int i = 0; i > indicesSize.size(); i++)

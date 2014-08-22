@@ -91,7 +91,7 @@ Entity::Entity(ModelManager *mod, GLuint modI, GLuint texI, glm::vec3 p, glm::qu
 		nonMoving = 1;
 
 	//Create bullet physics stuff
-	motionState = new btDefaultMotionState(btTransform(btQuaternion(r.z, r.x, r.y, r.w), btVector3(p.x, p.y, p.z)));
+	btDefaultMotionState* motionState = new btDefaultMotionState(btTransform(btQuaternion(r.z, r.x, r.y, r.w), btVector3(p.x, p.y, p.z)));
 	if (mass > 0)
 		colShape->calculateLocalInertia(mass, *interia);
 	btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(mass, motionState, colShape, *interia);

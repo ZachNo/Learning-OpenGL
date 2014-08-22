@@ -67,11 +67,9 @@ void computeMatricesFromInputs(GLFWwindow* window, btDynamicsWorld* world, float
 			btCollisionObject* obA = const_cast<btCollisionObject*>(contactManifold->getBody0());
 			btCollisionObject* obB = const_cast<btCollisionObject*>(contactManifold->getBody1());
 
+			//If neither object is the ball, skip
 			if (obA != ent->getRigidBody() && obB != ent->getRigidBody())
-			{
-				std::cout << "Neither object is ball!\n" << obA << " != " << ent->getRigidBody() << "\n" << obB << " != " << ent->getRigidBody() << std::endl;
 				continue;
-			}
 
 			int numContacts = contactManifold->getNumContacts();
 			for (int j = 0; j<numContacts; j++)
@@ -81,11 +79,11 @@ void computeMatricesFromInputs(GLFWwindow* window, btDynamicsWorld* world, float
 					normal = pt.m_normalWorldOnB;
 			}
 		}
+		//If found a contact point between the ball and anything, jump away from the thing
 		if (normal != btVector3(0.0f, 0.0f, 0.0f))
 		{
 			ent->getRigidBody()->applyImpulse(normal * 10, btVector3(0, 1, 0));
 			lastTime = glfwGetTime();
-			std::cout << normal.getX() << " " << normal.getY() << " " << normal.getZ() << std::endl;
 		}
 	}
 

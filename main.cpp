@@ -124,15 +124,18 @@ int main()
 	//btCollisionShape* groundShape = new btBoxShape(btVector3(30, 0.1, 30));
 	btCollisionShape* sphereShape = new btSphereShape(1.0f);
 
+	//create the player ball and the level
 	entities->createEntity("sphere.obj", "checker.png", glm::vec3(0, 0, 0), glm::quat(0, 0, 0, 1), sphereShape, btScalar(1), &btVector3(0, 0, 0));
-	entities->createEntity("ball_testCourse.obj", "test_texture.png", glm::vec3(0, -5, 0), glm::quat(1, 0, 0, 0), NULL);
+	entities->createEntity("ball_testCourse.obj", "test_texture.png", glm::vec3(0, -5, 0), glm::quat(1, 0, 0, 0), NULL); //put NULL in last parameter to have the mesh be the collsion mesh also
 
-	std::cout << "initialized col mesh successfully\n"; 
-
+	//Set ball physical properties
 	entities->getEntity(0)->setRestitution(0.8f);
 	entities->getEntity(0)->getRigidBody()->setRollingFriction(0.3f);
 	entities->getEntity(0)->setFriction(1);
+	//Make sure ball doesn't get deactivated by Bullet if resting too long
 	entities->getEntity(0)->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
+
+	//set level physical properties
 	entities->getEntity(1)->setRestitution(0.5f);
 	entities->getEntity(1)->setFriction(1);
 	entities->getEntity(1)->getRigidBody()->setRollingFriction(1);
@@ -172,6 +175,7 @@ int main()
 				// Use our shader
 				glUseProgram(programID);
 
+				//Unlock mouse from program
 				if (glfwGetKey(window, GLFW_KEY_L) && !L_keyDown)
 				{
 					if (mouseLock)
@@ -189,12 +193,14 @@ int main()
 				glm::vec3 lightPos = glm::vec3(4, 4, 4);
 				glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
 
+				//step the physics
 				dynamicsWorld->stepSimulation(1 / 144.0f, 10);
 
+				//Update and draw all entities
 				entities->updateAll();
 				entities->drawAll(&ProjectionMatrix, &ViewMatrix);
 
-
+				//Disable render arrays
 				glDisableVertexAttribArray(0);
 				glDisableVertexAttribArray(1);
 				glDisableVertexAttribArray(2);
@@ -225,12 +231,14 @@ int main()
 	glDeleteTextures(1, &TextureID);
 	glDeleteVertexArrays(1, &VertexArrayID);
 
+	//Delete entity manager and physics manager
 	delete entities;
 	delete physMan;
 
 	// Close OpenGL window and terminate GLFW
 	glfwTerminate();
 
+	//Monitor the amount of memory at the end of the program
 	_CrtMemState s2;
 	_CrtMemCheckpoint(&s2);
 	_CrtMemState s3;
