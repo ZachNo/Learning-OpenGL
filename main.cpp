@@ -17,10 +17,7 @@ using namespace glm;
 //Include Bullet Physics
 #include <btBulletDynamicsCommon.h>
 
-//Include Visual Studio Memory Leak Detection
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
+#include <vld.h>
 
 //Defined for texturemanager
 #define STB_IMAGE_IMPLEMENTATION
@@ -45,22 +42,20 @@ using namespace glm;
 
 int main()
 {
-	_CrtMemState s1;
-	_CrtMemCheckpoint(&s1);
 	// Initialise GLFW
 	if (!glfwInit())
 	{
 		fprintf(stderr, "Failed to initialize GLFW\n");
 		return -1;
 	}
-
+	GLFWwindow* window;
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Open a window and create its OpenGL context
-	GLFWwindow* window;
+
 	window = glfwCreateWindow(1024, 768, "MEOW", NULL, NULL);
 	if (window == NULL){
 		reportError("Failed to open GLFW window.\n",1);
@@ -111,7 +106,7 @@ int main()
 	GLuint TextureID = glGetUniformLocation(programID, "myTextureSampler");
 
 	// Get a handle for our "LightPosition" uniform
-	glUseProgram(programID);
+	//glUseProgram(programID);
 	GLuint LightID = glGetUniformLocation(programID, "LightPosition_worldspace");
 	
 	//Bullet physics stuffs
@@ -237,15 +232,6 @@ int main()
 
 	// Close OpenGL window and terminate GLFW
 	glfwTerminate();
-
-	//Monitor the amount of memory at the end of the program
-	_CrtMemState s2;
-	_CrtMemCheckpoint(&s2);
-	_CrtMemState s3;
-	if (_CrtMemDifference(&s3, &s1, &s2))
-		_CrtMemDumpStatistics(&s3);
-	else
-		std::cout << "No difference1\n";
 
 	//system("pause");
 
