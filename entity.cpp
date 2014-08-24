@@ -3,11 +3,20 @@
 #include "entity.h"
 
 //Draw the model through the model manager
-bool Entity::draw(glm::mat4* proj, glm::mat4* view)
+bool Entity::draw(glm::mat4* proj, glm::mat4* view, bool drawOnlyVerts, GLuint *matID)
 {
 	if (visible)
 	{
-		if (!modMan->draw(modelIndex, textureIndex, pos, rot, scale, proj, view))
+		if (!modMan->draw(modelIndex, textureIndex, pos, rot, scale, proj, view, drawOnlyVerts, matID))
+			return 0;
+	}
+	return 1;
+}
+bool Entity::draw(glm::mat4* proj, glm::mat4* view, bool drawOnlyVerts, GLuint *matID, GLuint overrideTex)
+{
+	if (visible)
+	{
+		if (!modMan->draw(modelIndex, overrideTex, pos, rot, scale, proj, view, drawOnlyVerts, matID))
 			return 0;
 	}
 	return 1;
@@ -68,7 +77,31 @@ bool EntityManager::drawAll(glm::mat4* proj, glm::mat4* view)
 		return 1;
 	for (unsigned int i = 0; i < allEntities.size(); i++)
 	{
-		if (!allEntities.at(i).draw(proj, view))
+		if (!allEntities.at(i).draw(proj, view, 0, NULL))
+			return 0;
+	}
+	return 1;
+}
+
+bool EntityManager::drawAll(glm::mat4* proj, glm::mat4* view, bool b, GLuint *matID)
+{
+	if (allEntities.size() < 1)
+		return 1;
+	for (unsigned int i = 0; i < allEntities.size(); i++)
+	{
+		if (!allEntities.at(i).draw(proj, view, b, matID))
+			return 0;
+	}
+	return 1;
+}
+
+bool EntityManager::drawAll(glm::mat4* proj, glm::mat4* view, bool b, GLuint *matID, GLuint overrideTex)
+{
+	if (allEntities.size() < 1)
+		return 1;
+	for (unsigned int i = 0; i < allEntities.size(); i++)
+	{
+		if (!allEntities.at(i).draw(proj, view, b, matID, overrideTex))
 			return 0;
 	}
 	return 1;

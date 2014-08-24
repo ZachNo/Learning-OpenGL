@@ -44,6 +44,8 @@ class ModelManager
 	GLuint ViewMatrixID;
 	GLuint ModelMatrixID;
 
+	std::vector<glm::mat4> depthMVPs;
+
 	GLuint checkIfModelExists(std::string filepath);
 public:
 	ModelManager()
@@ -58,9 +60,11 @@ public:
 	~ModelManager();
 
 	GLuint newModel(std::string filepath, bool useMeshAsColShape);
-	bool draw(GLuint index, GLuint texIndex, glm::vec3 pos, glm::quat rot, glm::vec3 scale, glm::mat4* projMat, glm::mat4* viewMat);
+	bool draw(GLuint index, GLuint texIndex, glm::vec3 pos, glm::quat rot, glm::vec3 scale, glm::mat4* projMat, glm::mat4* viewMat, bool drawOnlyVerts, GLuint *matID);
 	btCollisionShape* getColShape(GLuint index)
 	{ return colShapes.at(index); }
+	void clearDepthMVP()
+	{ depthMVPs.clear(); }
 };
 
 #endif

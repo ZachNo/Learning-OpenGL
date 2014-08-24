@@ -80,7 +80,8 @@ public:
 	{ return modelIndex; }
 
 	//draw the obj
-	bool draw(glm::mat4* proj, glm::mat4* view);
+	bool draw(glm::mat4* proj, glm::mat4* view, bool drawOnlyVerts, GLuint *matID);
+	bool draw(glm::mat4* proj, glm::mat4* view, bool drawOnlyVerts, GLuint *matID, GLuint overrideTex);
 	//update the obj
 	void update();
 
@@ -109,6 +110,8 @@ public:
 	bool createEntity(std::string modelFile, std::string textureFile, glm::vec3 pos, glm::quat rot, btCollisionShape* colShape, btScalar mass, btVector3 *interia);
 	//draw all entities
 	bool drawAll(glm::mat4* proj, glm::mat4* view);
+	bool drawAll(glm::mat4* proj, glm::mat4* view, bool drawOnlyVerts, GLuint *matID);
+	bool drawAll(glm::mat4* proj, glm::mat4* view, bool drawOnlyVerts, GLuint *matID, GLuint overrideTex);
 	//update all entities
 	void updateAll();
 	//get a certain entity

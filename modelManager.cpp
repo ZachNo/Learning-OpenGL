@@ -131,11 +131,47 @@ GLuint ModelManager::newModel(std::string filepath, bool useMeshAsColShape)
 }
 
 //draw the model
-bool ModelManager::draw(GLuint index, GLuint texIndex, glm::vec3 pos, glm::quat rot, glm::vec3 scale, glm::mat4* projMat, glm::mat4* viewMat)
+bool ModelManager::draw(GLuint index, GLuint texIndex, glm::vec3 pos, glm::quat rot, glm::vec3 scale, glm::mat4* projMat, glm::mat4* viewMat, bool drawOnlyVerts, GLuint *matID)
 {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texIndex);
 	glUniform1i(texID, 0);
+
+	glm::mat4 RotationMatrix = mat4_cast(rot);
+	glm::mat4 TranslationMatrix = translate(mat4(), pos);
+	glm::mat4 ScalingMatrix = glm::scale(mat4(), scale);
+	glm::mat4 ModelMatrix = TranslationMatrix * RotationMatrix * ScalingMatrix;
+
+	glm::mat4 MVP = *projMat * *viewMat * ModelMatrix;
+	// Send our transformation to the currently bound shader, 
+	// in the "MVP" uniform
+	if (matID == NULL)
+	{
+		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+		glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
+	}
+	else if (drawOnlyVerts)
+	{
+		glm::mat4 depthMVP = *projMat * *viewMat * ModelMatrix;
+		glUniformMatrix4fv(*matID, 1, GL_FALSE, &depthMVP[0][0]);
+		depthMVPs.push_back(depthMVP);
+	}
+	else if (matID != NULL && !drawOnlyVerts)
+	{
+		glm::mat4 depthMVP = depthMVPs.at(index);
+		glm::mat4 biasMatrix(
+			0.5, 0.0, 0.0, 0.0,
+			0.0, 0.5, 0.0, 0.0,
+			0.0, 0.0, 0.5, 0.0,
+			0.5, 0.5, 0.5, 1.0
+			);
+
+		glm::mat4 depthBiasMVP = biasMatrix * depthMVP;
+
+		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+		glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
+		glUniformMatrix4fv(*matID, 1, GL_FALSE, &depthBiasMVP[0][0]);
+	}
 
 	GLuint vertexbuffer = vertices.at(index);
 	GLuint uvbuffer = uvs.at(index);
@@ -152,42 +188,31 @@ bool ModelManager::draw(GLuint index, GLuint texIndex, glm::vec3 pos, glm::quat 
 		0,                  // stride
 		(void*)0            // array buffer offset
 		);
+	if (!drawOnlyVerts)
+	{
+		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+		glVertexAttribPointer(
+			1,                                // attribute
+			2,                                // size
+			GL_FLOAT,                         // type
+			GL_FALSE,                         // normalized?
+			0,                                // stride
+			(void*)0                          // array buffer offset
+			);
 
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-	glVertexAttribPointer(
-		1,                                // attribute
-		2,                                // size
-		GL_FLOAT,                         // type
-		GL_FALSE,                         // normalized?
-		0,                                // stride
-		(void*)0                          // array buffer offset
-		);
-
-	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
-	glVertexAttribPointer(
-		2,                                // attribute
-		3,                                // size
-		GL_FLOAT,                         // type
-		GL_FALSE,                         // normalized?
-		0,                                // stride
-		(void*)0                          // array buffer offset
-		);
-
+		glEnableVertexAttribArray(2);
+		glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
+		glVertexAttribPointer(
+			2,                                // attribute
+			3,                                // size
+			GL_FLOAT,                         // type
+			GL_FALSE,                         // normalized?
+			0,                                // stride
+			(void*)0                          // array buffer offset
+			);
+	}
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
-
-	glm::mat4 RotationMatrix = mat4_cast(rot);
-	glm::mat4 TranslationMatrix = translate(mat4(), pos);
-	glm::mat4 ScalingMatrix = glm::scale(mat4(), scale);
-	glm::mat4 ModelMatrix = TranslationMatrix * RotationMatrix * ScalingMatrix;
-
-	glm::mat4 MVP = *projMat * *viewMat * ModelMatrix;
-	// Send our transformation to the currently bound shader, 
-	// in the "MVP" uniform
-	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-	glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
-	glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &(*viewMat)[0][0]);
 
 	// Draw the triangles !
 	glDrawElements(
@@ -196,6 +221,7 @@ bool ModelManager::draw(GLuint index, GLuint texIndex, glm::vec3 pos, glm::quat 
 		GL_UNSIGNED_SHORT,   // type
 		(void*)0           // element array buffer offset
 		);
+
 	return 1;
 }
 
